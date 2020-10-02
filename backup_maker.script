@@ -1,0 +1,53 @@
+#!/bin/bash
+# Script for making backups of tablename of given database. It storage them in folders like 2020/10/12.
+# Script deletes backups older 2 days
+
+# Set DataBase name here!
+DATABASE="wdb"
+TABLENAME="records"
+
+# Marking for syslog
+echo "BACKUP_MAKER has been started the job"
+# Getting vars
+CUR_DIR="$(pwd)"
+YEAR="$(date +%Y)"
+MONTH="$(date +%m)"
+DAY="$(date +%d)"
+DAY_BEFORE="$DAY"
+DATETIME="$(date +%H:%M)"
+FILENAME="backup_$DATETIME"
+# Getting vars concerning yesterday
+DAY_AGO_DAY="$(date -d 'yesterday' +%d)"
+DAY_AGO_MONTH="$(date -d 'yesterday' +%m)"
+DAY_AGO_YEAR="$(date -d 'yesterday' +%Y)"
+# Getting vars concerning 2 days ago
+DAYS_AGO_DAY="$(date -d '2 days ago' +%d)"
+DAYS_AGO_MONTH="$(date -d '2 days ago' +%m)"
+DAYS_AGO_YEAR="$(date -d '2 days ago' +%Y)"
+
+
+# MAIN BODY
+# Move to folder
+[ ! -d "$YEAR" ] && mkdir -p "$YEAR"
+cd "$YEAR"
+[ ! -d "$MONTH" ] && mkdir -p "$MONTH"
+cd "$MONTH"
+[ ! -d "$DAY" ] && mkdir -p "$DAY"
+cd "$DAY"
+# Make backup
+pg_dump -t $TABLENAME $DATABASE > $FILENAME
+
+# DELETE OLD BACKUPS
+# Delete yesterday folder
+cd "$CUR_DIR"
+#cd DAY_AGO_YEAR
+#cd DAY_AGO_MONTH
+#rm -rF DAY_AGO_DAY
+
+# Deletete 2 days ago folder
+cd "$CUR_DIR"
+#cd DAYS_AGO_YEAR
+#cd DAYS_AGO_MONTH
+#rm -rF DAYS_AGO_DAY
+
+echo "BACKUP_MAKER done job with success"
